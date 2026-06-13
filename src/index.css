@@ -833,3 +833,20 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--white);
   border-color: var(--primary-red);
 }
+
+/* Custom Programmatic Hover effects */
+.related-tool-card {
+  transition: all 0.15s ease;
+}
+.related-tool-card:hover {
+  border-color: #e52d27 !important;
+  transform: translateY(-1px);
+}
+
+.blog-card-link {
+  transition: all 0.2s ease;
+}
+.blog-card-link:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+}

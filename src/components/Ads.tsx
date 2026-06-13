@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useRef } from 'react';
 
 // 468x60 Banner Ad Component
@@ -30,7 +32,7 @@ export const BannerAd468x60: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '2rem auto', gap: '0.25rem' }}>
-      <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', tracking: '0.05em', color: 'var(--text-muted)', fontWeight: 700 }}>Sponsored</span>
+      <span style={{ fontSize: '0.65rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', fontWeight: 700 }}>Sponsored</span>
       <div ref={containerRef} style={{ width: '468px', height: '60px', overflow: 'hidden', backgroundColor: 'transparent' }}></div>
     </div>
   );

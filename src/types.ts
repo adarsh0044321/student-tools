@@ -30,15 +30,33 @@ export type ToolId =
   | 'redact'
   | 'compare'
   | 'ai-summarizer'
-  | 'translate';
+  | 'translate'
+  | 'cgpa-calculator'
+  | 'attendance-calculator'
+  | 'percentage-calculator'
+  | 'marks-calculator'
+  | 'pomodoro-timer'
+  | 'unit-converter'
+  | 'scientific-calculator'
+  | 'word-counter'
+  | 'age-calculator'
+  | 'exam-countdown'
+  | 'grade-calculator'
+  | 'gpa-to-percentage';
 
 export interface ToolConfig {
   id: ToolId;
   title: string;
   desc: string;
   iconName: string;
-  category: 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'edit-pdf' | 'security' | 'pdf-intelligence';
-  studentContext: string; // Explanation of how this helps students
+  category: 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'edit-pdf' | 'security' | 'pdf-intelligence' | 'student-tools' | 'productivity-tools';
+  studentContext: string;
+  // SEO programmatic properties
+  seoTitle?: string;
+  seoMetaDesc?: string;
+  howItWorks?: string[];
+  benefits?: string[];
+  faqs?: Array<{ q: string; a: string }>;
 }
 
 export type Stage = 'upload' | 'config' | 'processing' | 'success';
@@ -47,5 +65,6 @@ export interface ProcessedFile {
   name: string;
   size: number;
   data: ArrayBuffer;
-  rotation?: number; // Rotate angle for visual previews (0, 90, 180, 270)
+  rotation?: number;
 }
+

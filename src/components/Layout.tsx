@@ -1,27 +1,42 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import type { ToolId } from '../types';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { toolsList } from '../toolsList';
-import { GraduationCap, Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
-  currentTool: ToolId | null;
-  setCurrentTool: (tool: ToolId | null) => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurrentTool }) => {
+export const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('theme');
       if (stored === 'dark') {
         document.documentElement.classList.add('dark-theme');
-        return 'dark';
+        setTheme('dark');
       }
     }
-    return 'light';
-  });
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark-theme');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   const [adblockActive, setAdblockActive] = useState(false);
 
@@ -56,46 +71,26 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
     return () => clearTimeout(timer);
   }, []);
 
-  const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(nextTheme);
-    if (nextTheme === 'dark') {
-      document.documentElement.classList.add('dark-theme');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark-theme');
-      localStorage.setItem('theme', 'light');
-    }
-  };
-
-  const handleToolSelect = (toolId: ToolId | null) => {
-    setCurrentTool(toolId);
-    setMobileMenuOpen(false);
-    setToolsDropdownOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <div className="app-container">
       {/* Header */}
       <header className="navbar">
         <div className="navbar-container">
-          <a href="#" className="nav-brand" onClick={(e) => { e.preventDefault(); handleToolSelect(null); }} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <Link href="/" className="nav-brand" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <img src="/logo.png" alt="Student Tools Logo" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border-color)' }} />
             <span>Student Tools</span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="nav-links" style={{ display: 'flex' }}>
             <div style={{ position: 'relative' }}>
-              <a 
-                href="#" 
+              <button 
                 className="nav-link" 
-                style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                onClick={(e) => { e.preventDefault(); setToolsDropdownOpen(!toolsDropdownOpen); }}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+                onClick={() => setToolsDropdownOpen(!toolsDropdownOpen)}
               >
                 All PDF Tools <ChevronDown size={14} />
-              </a>
+              </button>
               
               {toolsDropdownOpen && (
                 <div style={{
@@ -114,42 +109,39 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
                   marginTop: '0.5rem'
                 }}>
                   {toolsList.map((t) => (
-                    <a
+                    <Link
                       key={t.id}
-                      href="#"
+                      href={`/tools/${t.id}`}
                       style={{
                         padding: '0.6rem 0.8rem',
                         fontSize: '0.88rem',
                         fontWeight: 600,
-                        color: currentTool === t.id ? '#e52d27' : 'var(--text-main)',
+                        color: pathname === `/tools/${t.id}` ? '#e52d27' : 'var(--text-main)',
                         textDecoration: 'none',
                         borderRadius: '6px',
                         display: 'block',
                         transition: '0.15s ease'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--light-bg)'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                      onClick={(e) => { e.preventDefault(); handleToolSelect(t.id); }}
+                      onClick={() => setToolsDropdownOpen(false)}
                     >
                       {t.title}
-                    </a>
+                    </Link>
                   ))}
                 </div>
               )}
             </div>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); handleToolSelect('merge'); }}>Merge</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); handleToolSelect('split'); }}>Split</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); handleToolSelect('compress'); }}>Compress</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); handleToolSelect('pdf-to-jpg'); }}>PDF to JPG</a>
+            <Link href="/tools/merge" className="nav-link">Merge</Link>
+            <Link href="/tools/split" className="nav-link">Split</Link>
+            <Link href="/tools/compress" className="nav-link">Compress</Link>
+            <Link href="/blog" className="nav-link">Blog</Link>
             
-            <a 
-              href="#" 
+            <Link 
+              href="/" 
               className="nav-btn" 
-              onClick={(e) => { e.preventDefault(); handleToolSelect(null); }}
               style={{ marginLeft: '1rem' }}
             >
               Get Started
-            </a>
+            </Link>
             <button
               onClick={toggleTheme}
               style={{
@@ -166,8 +158,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
                 marginLeft: '0.75rem',
                 transition: '0.15s ease'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--border-color)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--light-bg)'}
               title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
             >
               {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
@@ -202,14 +192,15 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
             maxHeight: '80vh',
             overflowY: 'auto'
           }}>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); handleToolSelect(null); }}>Home</a>
+            <Link href="/" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+            <Link href="/blog" className="nav-link" onClick={() => setMobileMenuOpen(false)}>Blog</Link>
             <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)' }} />
             <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>All Tools</span>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               {toolsList.map((t) => (
-                <a
+                <Link
                   key={t.id}
-                  href="#"
+                  href={`/tools/${t.id}`}
                   style={{
                     padding: '0.5rem',
                     fontSize: '0.85rem',
@@ -217,10 +208,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
                     color: 'var(--text-main)',
                     textDecoration: 'none'
                   }}
-                  onClick={(e) => { e.preventDefault(); handleToolSelect(t.id); }}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   {t.title}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -236,10 +227,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-branding">
-            <a href="#" className="footer-logo" onClick={(e) => { e.preventDefault(); handleToolSelect(null); }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Link href="/" className="footer-logo" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <img src="/logo.png" alt="Student Tools Logo" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }} />
               <span>Student Tools</span>
-            </a>
+            </Link>
             <p className="footer-desc">
               Your academic PDF sidekick. Student Tools is 100% free, runs entirely in your web browser (client-side), and never uploads your files to any server. Your homework and essays stay private and secure.
             </p>
@@ -247,28 +238,28 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
           <div>
             <h4 className="footer-column-title">Popular Tools</h4>
             <ul className="footer-links">
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('merge'); }}>Merge PDF</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('split'); }}>Split PDF</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('compress'); }}>Compress PDF</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('organize'); }}>Organize PDF</a></li>
+              <li><Link href="/tools/merge" className="footer-link">Merge PDF</Link></li>
+              <li><Link href="/tools/split" className="footer-link">Split PDF</Link></li>
+              <li><Link href="/tools/compress" className="footer-link">Compress PDF</Link></li>
+              <li><Link href="/tools/organize" className="footer-link">Organize PDF</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="footer-column-title">Conversions</h4>
             <ul className="footer-links">
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('jpg-to-pdf'); }}>JPG to PDF</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('pdf-to-jpg'); }}>PDF to JPG</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('word-to-pdf'); }}>Word to PDF</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('pdf-to-word'); }}>PDF to Word</a></li>
+              <li><Link href="/tools/jpg-to-pdf" className="footer-link">JPG to PDF</Link></li>
+              <li><Link href="/tools/pdf-to-jpg" className="footer-link">PDF to JPG</Link></li>
+              <li><Link href="/tools/word-to-pdf" className="footer-link">Word to PDF</Link></li>
+              <li><Link href="/tools/pdf-to-word" className="footer-link">PDF to Word</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="footer-column-title">Security & More</h4>
             <ul className="footer-links">
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('protect'); }}>Protect PDF</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('unlock'); }}>Unlock PDF</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('watermark'); }}>Watermark PDF</a></li>
-              <li><a href="#" className="footer-link" onClick={(e) => { e.preventDefault(); handleToolSelect('page-numbers'); }}>Page Numbers</a></li>
+              <li><Link href="/tools/protect" className="footer-link">Protect PDF</Link></li>
+              <li><Link href="/tools/unlock" className="footer-link">Unlock PDF</Link></li>
+              <li><Link href="/tools/watermark" className="footer-link">Watermark PDF</Link></li>
+              <li><Link href="/tools/page-numbers" className="footer-link">Page Numbers</Link></li>
             </ul>
           </div>
         </div>

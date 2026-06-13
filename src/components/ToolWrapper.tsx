@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { ToolConfig, Stage } from '../types';
 import { toolsList } from '../toolsList';
@@ -38,9 +40,22 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs
 
 import { BannerAd160x300, NativeAdBanner } from './Ads';
 
+import { CGPACalculator } from './calculators/CGPACalculator';
+import { AttendanceCalculator } from './calculators/AttendanceCalculator';
+import { PercentageCalculator } from './calculators/PercentageCalculator';
+import { MarksCalculator } from './calculators/MarksCalculator';
+import { PomodoroTimer } from './calculators/PomodoroTimer';
+import { UnitConverter } from './calculators/UnitConverter';
+import { ScientificCalculator } from './calculators/ScientificCalculator';
+import { WordCounter } from './calculators/WordCounter';
+import { AgeCalculator } from './calculators/AgeCalculator';
+import { ExamCountdown } from './calculators/ExamCountdown';
+import { GradeCalculator } from './calculators/GradeCalculator';
+import { GpaToPercentage } from './calculators/GpaToPercentage';
+
 interface ToolWrapperProps {
   toolConfig: ToolConfig;
-  setCurrentTool: (toolId: null) => void;
+  setCurrentTool?: (toolId: null) => void;
 }
 
 const SignaturePad: React.FC<{ onSave: (dataUrl: string) => void }> = ({ onSave }) => {
@@ -167,6 +182,26 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
   const [pageNumberFormat, setPageNumberFormat] = useState<'n' | 'n-of-m'>('n');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isCalculator = ['student-tools', 'productivity-tools'].includes(toolConfig.category);
+
+  const renderCalculator = () => {
+    switch (toolConfig.id) {
+      case 'cgpa-calculator': return <CGPACalculator />;
+      case 'attendance-calculator': return <AttendanceCalculator />;
+      case 'percentage-calculator': return <PercentageCalculator />;
+      case 'marks-calculator': return <MarksCalculator />;
+      case 'pomodoro-timer': return <PomodoroTimer />;
+      case 'unit-converter': return <UnitConverter />;
+      case 'scientific-calculator': return <ScientificCalculator />;
+      case 'word-counter': return <WordCounter />;
+      case 'age-calculator': return <AgeCalculator />;
+      case 'exam-countdown': return <ExamCountdown />;
+      case 'grade-calculator': return <GradeCalculator />;
+      case 'gpa-to-percentage': return <GpaToPercentage />;
+      default: return null;
+    }
+  };
 
   // Generate previews for PDF files using PDF.js
   const generatePdfPreviews = async (fileInfo: UploadedFileInfo): Promise<UploadedFileInfo> => {
@@ -969,7 +1004,7 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
     <div className="workspace-container">
       {/* Back Button */}
       <button 
-        onClick={() => setCurrentTool(null)}
+        onClick={() => setCurrentTool ? setCurrentTool(null) : (window.location.href = '/')}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -1011,8 +1046,22 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
         </div>
       )}
 
-      {/* STAGE 1: UPLOAD */}
-      {stage === 'upload' && (
+      {isCalculator ? (
+        <div style={{
+          backgroundColor: 'var(--white)',
+          borderRadius: '16px',
+          border: '1px solid var(--border-color)',
+          boxShadow: 'var(--shadow-sm)',
+          padding: '2.5rem 2rem',
+          maxWidth: '640px',
+          margin: '0 auto'
+        }}>
+          {renderCalculator()}
+        </div>
+      ) : (
+        <>
+          {/* STAGE 1: UPLOAD */}
+          {stage === 'upload' && (
         <div 
           className={`upload-dropzone ${dragActive ? 'drag-active' : ''}`}
           onDragEnter={handleDrag}
@@ -1202,7 +1251,7 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
               </button>
               <button 
                 className="secondary-action-btn"
-                onClick={() => setCurrentTool(null)}
+                onClick={() => setCurrentTool ? setCurrentTool(null) : (window.location.href = '/')}
               >
                 Back to dashboard
               </button>
@@ -1210,6 +1259,8 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
           </div>
         </div>
       )}
+    </>
+  )}
       <NativeAdBanner />
     </div>
   );
