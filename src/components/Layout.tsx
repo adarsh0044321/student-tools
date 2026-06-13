@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { ToolId } from '../types';
 import { toolsList } from '../toolsList';
-import { GraduationCap, Menu, X, ChevronDown } from 'lucide-react';
+import { GraduationCap, Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,6 +12,28 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurrentTool }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'dark') {
+        document.documentElement.classList.add('dark-theme');
+        return 'dark';
+      }
+    }
+    return 'light';
+  });
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    if (nextTheme === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark-theme');
+      localStorage.setItem('theme', 'light');
+    }
+  };
 
   const handleToolSelect = (toolId: ToolId | null) => {
     setCurrentTool(toolId);
@@ -47,10 +69,10 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
                   position: 'absolute',
                   top: '100%',
                   left: 0,
-                  backgroundColor: '#ffffff',
-                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)',
+                  backgroundColor: 'var(--white)',
+                  boxShadow: 'var(--shadow-lg)',
                   borderRadius: '12px',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--border-color)',
                   padding: '1rem',
                   display: 'grid',
                   gridTemplateColumns: 'repeat(3, 220px)',
@@ -66,13 +88,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
                         padding: '0.6rem 0.8rem',
                         fontSize: '0.88rem',
                         fontWeight: 600,
-                        color: currentTool === t.id ? '#e52d27' : '#1e293b',
+                        color: currentTool === t.id ? '#e52d27' : 'var(--text-main)',
                         textDecoration: 'none',
                         borderRadius: '6px',
                         display: 'block',
                         transition: '0.15s ease'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--light-bg)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       onClick={(e) => { e.preventDefault(); handleToolSelect(t.id); }}
                     >
@@ -95,13 +117,35 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
             >
               Get Started
             </a>
+            <button
+              onClick={toggleTheme}
+              style={{
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--text-dark)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '0.5rem',
+                borderRadius: '50%',
+                backgroundColor: 'var(--light-bg)',
+                marginLeft: '0.75rem',
+                transition: '0.15s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--border-color)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--light-bg)'}
+              title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
           </nav>
 
           {/* Mobile Menu Icon */}
           <div style={{ display: 'none' }} className="mobile-toggle-btn">
             <button 
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#1e293b' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-main)' }}
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -115,8 +159,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
             top: '100%',
             left: 0,
             width: '100%',
-            backgroundColor: '#ffffff',
-            borderBottom: '1px solid #e2e8f0',
+            backgroundColor: 'var(--white)',
+            borderBottom: '1px solid var(--border-color)',
             padding: '1.5rem',
             zIndex: 199,
             display: 'flex',
@@ -126,8 +170,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
             overflowY: 'auto'
           }}>
             <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); handleToolSelect(null); }}>Home</a>
-            <hr style={{ border: 'none', borderTop: '1px solid #e2e8f0' }} />
-            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>All Tools</span>
+            <hr style={{ border: 'none', borderTop: '1px solid var(--border-color)' }} />
+            <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>All Tools</span>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               {toolsList.map((t) => (
                 <a
@@ -137,7 +181,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
                     padding: '0.5rem',
                     fontSize: '0.85rem',
                     fontWeight: 600,
-                    color: '#1e293b',
+                    color: 'var(--text-main)',
                     textDecoration: 'none'
                   }}
                   onClick={(e) => { e.preventDefault(); handleToolSelect(t.id); }}

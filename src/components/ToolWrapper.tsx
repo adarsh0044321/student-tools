@@ -385,6 +385,10 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
     setStage('upload');
   };
 
+  useEffect(() => {
+    handleReset();
+  }, [toolConfig.id]);
+
   const renderConfigOptions = () => {
     switch (toolConfig.id) {
       case 'merge':
@@ -696,11 +700,7 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
     <div className="workspace-container">
       {/* Back Button */}
       <button 
-        onClick={() => {
-          if (stage === 'config') setStage('upload');
-          else if (stage === 'success') handleReset();
-          else setCurrentTool(null);
-        }}
+        onClick={() => setCurrentTool(null)}
         style={{
           display: 'flex',
           alignItems: 'center',
