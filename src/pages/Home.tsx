@@ -7,7 +7,7 @@ interface HomeProps {
   setCurrentTool: (tool: ToolId) => void;
 }
 
-type CategoryFilter = 'all' | 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'security';
+type CategoryFilter = 'all' | 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'edit-pdf' | 'security' | 'pdf-intelligence';
 
 export const Home: React.FC<HomeProps> = ({ setCurrentTool }) => {
   const [filter, setFilter] = useState<CategoryFilter>('all');
@@ -54,7 +54,7 @@ export const Home: React.FC<HomeProps> = ({ setCurrentTool }) => {
         }}>
           {/* Filters */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {(['all', 'organize', 'optimize', 'convert-to', 'convert-from', 'security'] as CategoryFilter[]).map((cat) => (
+            {(['all', 'organize', 'optimize', 'convert-to', 'convert-from', 'edit-pdf', 'security', 'pdf-intelligence'] as CategoryFilter[]).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setFilter(cat)}

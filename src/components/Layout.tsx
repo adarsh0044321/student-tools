@@ -47,8 +47,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
       {/* Header */}
       <header className="navbar">
         <div className="navbar-container">
-          <a href="#" className="nav-brand" onClick={(e) => { e.preventDefault(); handleToolSelect(null); }}>
-            <span className="nav-brand-logo">🎓</span>
+          <a href="#" className="nav-brand" onClick={(e) => { e.preventDefault(); handleToolSelect(null); }} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <img src="/logo.png" alt="Student Tools Logo" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--border-color)' }} />
             <span>Student Tools</span>
           </a>
 
@@ -203,8 +203,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-branding">
-            <a href="#" className="footer-logo" onClick={(e) => { e.preventDefault(); handleToolSelect(null); }}>
-              🎓 <span>Student Tools</span>
+            <a href="#" className="footer-logo" onClick={(e) => { e.preventDefault(); handleToolSelect(null); }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <img src="/logo.png" alt="Student Tools Logo" style={{ width: '30px', height: '30px', borderRadius: '50%', objectFit: 'cover' }} />
+              <span>Student Tools</span>
             </a>
             <p className="footer-desc">
               Your academic PDF sidekick. Student Tools is 100% free, runs entirely in your web browser (client-side), and never uploads your files to any server. Your homework and essays stay private and secure.

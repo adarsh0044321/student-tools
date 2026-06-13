@@ -23,6 +23,12 @@ import { processWordToPdf } from '../tools/wordToPdf';
 import { processExcelToPdf } from '../tools/excelToPdf';
 import { processPdfToWord } from '../tools/pdfToWord';
 import { processPdfToExcel } from '../tools/pdfToExcel';
+import {
+  processRemovePages, processScanToPdf, processRepair, processOcr,
+  processPptToPdf, processPdfToPpt, processHtmlToPdf, processPdfa,
+  processCropPdf, processEditPdf, processSignPdf, processRedactPdf,
+  processComparePdf, processAiSummarize, processTranslatePdf
+} from '../tools/additionalTools';
 
 // Import PDF.js for visual page previews
 import * as pdfjsLib from 'pdfjs-dist';
@@ -34,6 +40,89 @@ interface ToolWrapperProps {
   toolConfig: ToolConfig;
   setCurrentTool: (toolId: null) => void;
 }
+
+const SignaturePad: React.FC<{ onSave: (dataUrl: string) => void }> = ({ onSave }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#000000';
+  }, []);
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    setIsDrawing(true);
+  };
+
+  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const rect = canvas.getBoundingClientRect();
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.stroke();
+    onSave(canvas.toDataURL());
+  };
+
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    onSave('');
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <canvas
+        ref={canvasRef}
+        width={250}
+        height={100}
+        style={{ border: '1px solid var(--border-color)', borderRadius: '6px', backgroundColor: '#ffffff', cursor: 'crosshair' }}
+        onMouseDown={startDrawing}
+        onMouseMove={draw}
+        onMouseUp={stopDrawing}
+        onMouseLeave={stopDrawing}
+      />
+      <button 
+        type="button"
+        onClick={clearCanvas} 
+        style={{
+          alignSelf: 'flex-start',
+          padding: '0.35rem 0.65rem',
+          fontSize: '0.75rem',
+          fontWeight: 700,
+          border: '1px solid var(--border-color)',
+          borderRadius: '4px',
+          backgroundColor: 'var(--light-bg)',
+          color: 'var(--text-main)',
+          cursor: 'pointer'
+        }}
+      >
+        Clear Signature
+      </button>
+    </div>
+  );
+};
 
 interface UploadedFileInfo {
   file: File;
@@ -209,8 +298,13 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
         return ['.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       case 'excel-to-pdf':
         return ['.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+      case 'powerpoint-to-pdf':
+        return ['.pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'];
       case 'jpg-to-pdf':
+      case 'scan-to-pdf':
         return ['image/jpeg', 'image/png', 'image/gif', 'image/bmp'];
+      case 'html-to-pdf':
+        return ['.html', '.txt', 'text/html', 'text/plain'];
       default:
         return ['application/pdf'];
     }
@@ -222,15 +316,20 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
         return 'Word Document (.docx)';
       case 'excel-to-pdf':
         return 'Excel Spreadsheet (.xlsx)';
+      case 'powerpoint-to-pdf':
+        return 'PowerPoint Slideshow (.pptx)';
       case 'jpg-to-pdf':
+      case 'scan-to-pdf':
         return 'Images (JPG, PNG, GIF, BMP)';
+      case 'html-to-pdf':
+        return 'HTML or Text Document (.html, .txt)';
       default:
         return 'PDF Files';
     }
   };
 
   const isMultiFileSupported = () => {
-    return ['merge', 'jpg-to-pdf'].includes(toolConfig.id);
+    return ['merge', 'jpg-to-pdf', 'scan-to-pdf', 'compare'].includes(toolConfig.id);
   };
 
   // Run the core PDF rendering and processing engines
@@ -339,6 +438,75 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
           resultBlob = await processPdfToExcel(mainFile);
           outName = `${mainFile.name.replace('.pdf', '')}_sheets.xlsx`;
           break;
+        case 'remove-pages':
+          resultBlob = await processRemovePages(fileBuffers[0], splitRanges);
+          outName = `student_${mainFile.name.replace('.pdf', '')}_removed.pdf`;
+          break;
+        case 'extract-pages':
+          resultBlob = await processSplit(fileBuffers[0], { mode: 'ranges', ranges: splitRanges });
+          outName = `student_${mainFile.name.replace('.pdf', '')}_extracted.pdf`;
+          break;
+        case 'scan-to-pdf':
+          resultBlob = await processScanToPdf(fileBuffers);
+          outName = 'student_scan.pdf';
+          break;
+        case 'repair':
+          resultBlob = await processRepair(fileBuffers[0]);
+          outName = `student_${mainFile.name.replace('.pdf', '')}_repaired.pdf`;
+          break;
+        case 'ocr':
+          resultBlob = await processOcr(mainFile);
+          outName = `student_${mainFile.name.replace('.pdf', '')}_ocr.txt`;
+          break;
+        case 'powerpoint-to-pdf':
+          resultBlob = await processPptToPdf(mainFile);
+          outName = `${mainFile.name.replace('.pptx', '')}_converted.pdf`;
+          break;
+        case 'pdf-to-powerpoint':
+          resultBlob = await processPdfToPpt(mainFile);
+          outName = `${mainFile.name.replace('.pdf', '')}_presentation.ppt`;
+          break;
+        case 'html-to-pdf':
+          resultBlob = await processHtmlToPdf(watermarkText);
+          outName = 'student_html.pdf';
+          break;
+        case 'pdf-to-pdfa':
+          resultBlob = await processPdfa(fileBuffers[0]);
+          outName = `student_${mainFile.name.replace('.pdf', '')}_pdfa.pdf`;
+          break;
+        case 'crop':
+          resultBlob = await processCropPdf(fileBuffers[0]);
+          outName = `student_${mainFile.name.replace('.pdf', '')}_cropped.pdf`;
+          break;
+        case 'edit-pdf':
+          resultBlob = await processEditPdf(fileBuffers[0], watermarkText);
+          outName = `student_${mainFile.name.replace('.pdf', '')}_edited.pdf`;
+          break;
+        case 'pdf-forms':
+          resultBlob = await processEditPdf(fileBuffers[0], watermarkText);
+          outName = `student_${mainFile.name.replace('.pdf', '')}_formfilled.pdf`;
+          break;
+        case 'sign':
+          resultBlob = await processSignPdf(fileBuffers[0], watermarkText);
+          outName = `student_${mainFile.name.replace('.pdf', '')}_signed.pdf`;
+          break;
+        case 'redact':
+          resultBlob = await processRedactPdf(fileBuffers[0]);
+          outName = `student_${mainFile.name.replace('.pdf', '')}_redacted.pdf`;
+          break;
+        case 'compare':
+          if (fileBuffers.length < 2) throw new Error('Please upload 2 PDF files to compare.');
+          resultBlob = await processComparePdf(fileBuffers[0], fileBuffers[1]);
+          outName = 'student_comparison_report.txt';
+          break;
+        case 'ai-summarizer':
+          resultBlob = await processAiSummarize(mainFile);
+          outName = `${mainFile.name.replace('.pdf', '')}_summary.md`;
+          break;
+        case 'translate':
+          resultBlob = await processTranslatePdf(mainFile, protectPassword);
+          outName = `${mainFile.name.replace('.pdf', '')}_translated.txt`;
+          break;
         default:
           throw new Error('Unsupported tool.');
       }
@@ -435,6 +603,26 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
                 </span>
               </div>
             )}
+          </div>
+        );
+
+      case 'remove-pages':
+      case 'extract-pages':
+        return (
+          <div className="options-content">
+            <div className="option-group">
+              <label className="option-label">Page Ranges</label>
+              <input 
+                type="text" 
+                value={splitRanges} 
+                onChange={(e) => setSplitRanges(e.target.value)} 
+                placeholder="e.g. 1-3, 5, 8-10" 
+                className="option-input"
+              />
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                Specify page numbers or ranges (e.g. "1-4, 7") to {toolConfig.id === 'remove-pages' ? 'remove' : 'extract'}.
+              </span>
+            </div>
           </div>
         );
 
@@ -661,6 +849,85 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
           <div className="options-content">
             <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
               Delete unnecessary pages by clicking the red X badge on thumbnails. You can also reorder pages (engine compiles lists).
+            </p>
+          </div>
+        );
+
+      case 'html-to-pdf':
+        return (
+          <div className="options-content">
+            <div className="option-group">
+              <label className="option-label">HTML or Plain Text Code</label>
+              <textarea 
+                value={watermarkText} 
+                onChange={(e) => setWatermarkText(e.target.value)} 
+                placeholder="Type or paste your HTML here..." 
+                className="option-input"
+                style={{ height: '200px', fontFamily: 'monospace' }}
+              />
+            </div>
+          </div>
+        );
+
+      case 'edit-pdf':
+      case 'pdf-forms':
+        return (
+          <div className="options-content">
+            <div className="option-group">
+              <label className="option-label">Text Annotation / Form Text</label>
+              <input 
+                type="text" 
+                value={watermarkText} 
+                onChange={(e) => setWatermarkText(e.target.value)} 
+                placeholder="Type text to add/fill..." 
+                className="option-input"
+              />
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                This text will be stamped or filled onto the document.
+              </span>
+            </div>
+          </div>
+        );
+
+      case 'sign':
+        return (
+          <div className="options-content">
+            <div className="option-group">
+              <label className="option-label">Draw Your Signature</label>
+              <SignaturePad onSave={(dataUrl) => setWatermarkText(dataUrl)} />
+              <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                Draw your signature in the box above. It will be stamped onto the document.
+              </span>
+            </div>
+          </div>
+        );
+
+      case 'translate':
+        return (
+          <div className="options-content">
+            <div className="option-group">
+              <label className="option-label">Translate Target Language</label>
+              <select 
+                value={protectPassword || 'Spanish'} 
+                onChange={(e) => setProtectPassword(e.target.value)} 
+                className="option-input"
+              >
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Japanese">Japanese</option>
+              </select>
+            </div>
+          </div>
+        );
+
+      case 'compare':
+        return (
+          <div className="options-content">
+            <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
+              Compare two PDF documents side-by-side. The comparison report will summarize file details and structural differences.
             </p>
           </div>
         );

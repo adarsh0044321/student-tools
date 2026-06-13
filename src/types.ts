@@ -13,14 +13,31 @@ export type ToolId =
   | 'word-to-pdf'
   | 'excel-to-pdf'
   | 'pdf-to-word'
-  | 'pdf-to-excel';
+  | 'pdf-to-excel'
+  | 'remove-pages'
+  | 'extract-pages'
+  | 'scan-to-pdf'
+  | 'repair'
+  | 'ocr'
+  | 'powerpoint-to-pdf'
+  | 'pdf-to-powerpoint'
+  | 'html-to-pdf'
+  | 'pdf-to-pdfa'
+  | 'crop'
+  | 'edit-pdf'
+  | 'pdf-forms'
+  | 'sign'
+  | 'redact'
+  | 'compare'
+  | 'ai-summarizer'
+  | 'translate';
 
 export interface ToolConfig {
   id: ToolId;
   title: string;
   desc: string;
   iconName: string;
-  category: 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'security';
+  category: 'organize' | 'optimize' | 'convert-to' | 'convert-from' | 'edit-pdf' | 'security' | 'pdf-intelligence';
   studentContext: string; // Explanation of how this helps students
 }
 
