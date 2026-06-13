@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ToolId } from '../types';
 import { toolsList } from '../toolsList';
 import { GraduationCap, Menu, X, ChevronDown, Sun, Moon } from 'lucide-react';
@@ -22,6 +22,39 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
     }
     return 'light';
   });
+
+  const [adblockActive, setAdblockActive] = useState(false);
+
+  useEffect(() => {
+    const checkAdblock = () => {
+      // Create a dummy ad element with common ad network class names
+      const testAd = document.createElement('div');
+      testAd.innerHTML = '&nbsp;';
+      testAd.className = 'ads advertisement ad-zone doubleclick banner-ad pub_300x250';
+      testAd.style.position = 'absolute';
+      testAd.style.left = '-9999px';
+      testAd.style.top = '-9999px';
+      testAd.style.width = '1px';
+      testAd.style.height = '1px';
+      
+      document.body.appendChild(testAd);
+      
+      // Check if it's hidden by the adblocker rules
+      const isBlocked = testAd.offsetHeight === 0 || 
+                        window.getComputedStyle(testAd).display === 'none' ||
+                        window.getComputedStyle(testAd).visibility === 'hidden';
+      
+      document.body.removeChild(testAd);
+      
+      if (isBlocked) {
+        setAdblockActive(true);
+      }
+    };
+
+    // Wait 1.5s for adblock extensions to analyze and block elements
+    const timer = setTimeout(checkAdblock, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const toggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
@@ -243,6 +276,63 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentTool, setCurren
           <p>&copy; {new Date().getFullYear()} Student Tools. Handcrafted for academic excellence. 📚 Offline-first & 100% Secure.</p>
         </div>
       </footer>
+
+      {/* Adblocker Detected Modal Overlay */}
+      {adblockActive && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(15, 23, 42, 0.9)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          padding: '1.5rem'
+        }}>
+          <div style={{
+            backgroundColor: 'var(--white)',
+            borderRadius: '16px',
+            border: '2px solid #e52d27',
+            padding: '2.5rem 2rem',
+            maxWidth: '480px',
+            width: '100%',
+            textAlign: 'center',
+            boxShadow: 'var(--shadow-xl)',
+            color: 'var(--text-main)'
+          }}>
+            <span style={{ fontSize: '3.5rem', display: 'block', marginBottom: '1.5rem' }}>🛡️</span>
+            <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#e52d27', marginBottom: '0.75rem' }}>Adblocker Detected</h2>
+            <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--text-muted)', marginBottom: '1.75rem' }}>
+              We noticed that you are using an adblocker. Student Tools is <strong>100% free</strong>, secure, and runs entirely on your device (no files are ever uploaded). 
+              <br /><br />
+              Please whitelist our site or disable your adblocker to support this service and access all PDF tools!
+            </p>
+            <button 
+              onClick={() => window.location.reload()}
+              style={{
+                width: '100%',
+                padding: '0.85rem 1.5rem',
+                fontSize: '1rem',
+                fontWeight: 700,
+                color: '#ffffff',
+                backgroundColor: '#e52d27',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: '0.15s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#c5201b'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e52d27'}
+            >
+              🔄 Reload Platform
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
