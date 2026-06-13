@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { toolsList } from '../toolsList';
 import type { ToolId } from '../types';
 import * as Icons from 'lucide-react';
+import { BannerAd468x60, StudentPromotionalOffers } from '../components/Ads';
 
 interface HomeProps {
   setCurrentTool: (tool: ToolId) => void;
@@ -134,6 +135,12 @@ export const Home: React.FC<HomeProps> = ({ setCurrentTool }) => {
             </div>
           ))}
         </div>
+
+        {/* Banner Ad */}
+        <BannerAd468x60 />
+
+        {/* Student Smartlink Offers */}
+        <StudentPromotionalOffers />
       </div>
     </div>
   );

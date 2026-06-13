@@ -36,6 +36,8 @@ import * as pdfjsLib from 'pdfjs-dist';
 // Configure PDF.js Worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.worker.min.mjs`;
 
+import { BannerAd160x300, NativeAdBanner } from './Ads';
+
 interface ToolWrapperProps {
   toolConfig: ToolConfig;
   setCurrentTool: (toolId: null) => void;
@@ -1142,6 +1144,7 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
             >
               🚀 Process to PDF <ChevronRight size={18} />
             </button>
+            <BannerAd160x300 />
           </div>
         </div>
       )}
@@ -1207,6 +1210,7 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
           </div>
         </div>
       )}
+      <NativeAdBanner />
     </div>
   );
 };
