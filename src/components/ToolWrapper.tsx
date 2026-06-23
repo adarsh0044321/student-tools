@@ -52,6 +52,8 @@ import { AgeCalculator } from './calculators/AgeCalculator';
 import { ExamCountdown } from './calculators/ExamCountdown';
 import { GradeCalculator } from './calculators/GradeCalculator';
 import { GpaToPercentage } from './calculators/GpaToPercentage';
+import { StudyPlanner } from './calculators/StudyPlanner';
+import { FlashcardsQuizzer } from './calculators/FlashcardsQuizzer';
 
 interface ToolWrapperProps {
   toolConfig: ToolConfig;
@@ -199,6 +201,8 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
       case 'exam-countdown': return <ExamCountdown />;
       case 'grade-calculator': return <GradeCalculator />;
       case 'gpa-to-percentage': return <GpaToPercentage />;
+      case 'study-planner': return <StudyPlanner />;
+      case 'flashcards': return <FlashcardsQuizzer />;
       default: return null;
     }
   };
@@ -1053,7 +1057,7 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
           border: '1px solid var(--border-color)',
           boxShadow: 'var(--shadow-sm)',
           padding: '2.5rem 2rem',
-          maxWidth: '640px',
+          maxWidth: ['study-planner', 'flashcards'].includes(toolConfig.id) ? '900px' : '640px',
           margin: '0 auto'
         }}>
           {renderCalculator()}

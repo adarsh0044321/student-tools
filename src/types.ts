@@ -42,7 +42,9 @@ export type ToolId =
   | 'age-calculator'
   | 'exam-countdown'
   | 'grade-calculator'
-  | 'gpa-to-percentage';
+  | 'gpa-to-percentage'
+  | 'study-planner'
+  | 'flashcards';
 
 export interface ToolConfig {
   id: ToolId;

@@ -977,5 +977,59 @@ export const toolsList: ToolConfig[] = [
       'Clear, instant calculation results.'
     ],
     faqs: []
+  },
+  {
+    id: 'study-planner',
+    title: 'Study Planner',
+    desc: 'Generate a personalized daily revision timetable based on exam dates, subjects, difficulty, and study hours.',
+    iconName: 'Calendar',
+    category: 'productivity-tools',
+    studentContext: 'Generates a day-by-day revision schedule distributing focus time according to subject difficulty.',
+    seoTitle: 'Free Online Student Study Planner & Revision Timetable Generator',
+    seoMetaDesc: 'Create a custom study plan for your upcoming exams. Set subject difficulty and daily study hours to build an optimized revision timetable.',
+    howItWorks: [
+      'Enter the start date and the end date (exam date) for your study block.',
+      'List the subjects you need to study, selecting their difficulty level (Easy, Medium, Hard).',
+      'Input the number of hours you can allocate for studying each day.',
+      'Click "Generate Timetable" to dynamically build and display your study plan.',
+      'Export the generated revision plan as a CSV file or print it for offline reference.'
+    ],
+    benefits: [
+      'Difficulty-weighted scheduling distributes more study hours to complex topics.',
+      'Generates chronological daily checklists with topics and rest times.',
+      'No data collection; all inputs stay local in your browser.',
+      'Supports printing and CSV download.'
+    ],
+    faqs: [
+      { q: 'How does the difficulty weighting work?', a: 'Hard subjects are allocated 3x more focus slots than Easy subjects, and Medium subjects are allocated 2x more slots, ensuring you study tough topics thoroughly.' },
+      { q: 'Can I export the schedule?', a: 'Yes, you can click the "Export CSV" button to download a spreadsheet or use the "Print" option to print it.' }
+    ]
+  },
+  {
+    id: 'flashcards',
+    title: 'Flashcard Quizzer',
+    desc: 'Create digital flashcards, practice with active recall, and take score-based quizzes.',
+    iconName: 'BookOpen',
+    category: 'productivity-tools',
+    studentContext: 'Great for memorizing key vocabulary, scientific definitions, or historical dates through self-testing.',
+    seoTitle: 'Free Online Flashcard Maker & Quiz Tool for Students',
+    seoMetaDesc: 'Create custom flashcard decks online. Review using active recall flip cards, test yourself with multiple-choice quizzes, and track your scores.',
+    howItWorks: [
+      'Select a sample deck or start adding cards manually to a new deck.',
+      'Enter the front (question/term) and back (answer/definition) for each card.',
+      'Use the Review Mode to flip cards and grade your confidence.',
+      'Switch to Quiz Mode to test yourself with randomly generated options.',
+      'Track your results and review the summary page to identify weak spots.'
+    ],
+    benefits: [
+      'Active recall review mode with self-grading.',
+      'Dynamic quiz mode auto-generates wrong options from other cards in the deck.',
+      'Import/Export decks as JSON files to share with study groups.',
+      'Pre-loaded computer science and biology flashcards to practice immediately.'
+    ],
+    faqs: [
+      { q: 'How does the quiz mode generate multiple choice answers?', a: 'It dynamically extracts answers from other cards in the same deck to create plausible options. For best results, ensure your deck has at least 4 cards.' },
+      { q: 'Can I save my decks for later?', a: 'Yes, you can export your deck as a JSON file and load it back anytime you want to study.' }
+    ]
   }
 ];
