@@ -1033,20 +1033,52 @@ export const ToolWrapper: React.FC<ToolWrapperProps> = ({ toolConfig, setCurrent
       </div>
 
       {errorMsg && (
-        <div style={{
-          backgroundColor: '#fff5f5',
-          border: '1px solid #feb2b2',
-          color: '#c53030',
-          padding: '1rem',
-          borderRadius: '8px',
-          marginBottom: '1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem',
-          fontSize: '0.9rem'
-        }}>
-          <AlertCircle size={20} />
-          <span>{errorMsg}</span>
+        <div 
+          className="fade-in"
+          style={{
+            backgroundColor: '#fee2e2',
+            borderLeft: '4px solid #dc2626',
+            borderTop: '1px solid #fee2e2',
+            borderRight: '1px solid #fee2e2',
+            borderBottom: '1px solid #fee2e2',
+            color: '#991b1b',
+            padding: '1.25rem',
+            borderRadius: '8px',
+            marginBottom: '2rem',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            gap: '0.75rem',
+            fontSize: '0.9rem',
+            boxShadow: 'var(--shadow-sm)'
+          }}
+        >
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <AlertCircle size={20} style={{ color: '#dc2626', flexShrink: 0 }} />
+            <div>
+              <strong style={{ display: 'block', marginBottom: '0.2rem', color: '#7f1d1d' }}>Processing Error</strong>
+              <span>{errorMsg}</span>
+            </div>
+          </div>
+          <button
+            onClick={() => setErrorMsg(null)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: '#991b1b',
+              padding: '0.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '4px',
+              transition: 'background-color 0.15s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(220, 38, 38, 0.1)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            <X size={16} />
+          </button>
         </div>
       )}
 

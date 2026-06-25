@@ -1,10 +1,10 @@
 /* Reset and Global Styles */
 :root {
-  --primary-red: #e52d27;
-  --primary-orange: #ff6a00;
-  --primary-gradient: linear-gradient(135deg, #e52d27 0%, #ff6a00 100%);
-  --primary-gradient-hover: linear-gradient(135deg, #d32020 0%, #e65c00 100%);
-  --primary-glow: 0 8px 30px rgba(229, 45, 39, 0.25);
+  --primary-red: #d32f2f;
+  --primary-orange: #bf360c;
+  --primary-gradient: linear-gradient(135deg, #d32f2f 0%, #bf360c 100%);
+  --primary-gradient-hover: linear-gradient(135deg, #b71c1c 0%, #9e2a09 100%);
+  --primary-glow: 0 8px 30px rgba(211, 47, 47, 0.25);
   
   --dark-slate: #0f172a;
   --dark-slate-hover: #1e293b;
@@ -849,4 +849,132 @@ h1, h2, h3, h4, h5, h6 {
 .blog-card-link:hover {
   transform: translateY(-2px) !important;
   box-shadow: var(--shadow-md) !important;
+}
+
+/* UI/UX Audit Fixes */
+
+/* 1. Hero CTA buttons & Spacing */
+.hero-cta-primary {
+  background: linear-gradient(135deg, #cc241d 0%, #9c1510 100%);
+  color: var(--white) !important;
+  border: none;
+  padding: 0.95rem 2.2rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(204, 36, 29, 0.25);
+  transition: var(--transition-normal);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero-cta-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(204, 36, 29, 0.35);
+  background: linear-gradient(135deg, #b31d17 0%, #850f0b 100%);
+}
+
+.hero-cta-secondary {
+  background-color: var(--white);
+  color: var(--text-dark) !important;
+  border: 2px solid var(--border-color);
+  padding: 0.9rem 2.2rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+  transition: var(--transition-normal);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.hero-cta-secondary:hover {
+  background-color: var(--light-bg);
+  border-color: var(--text-muted);
+}
+
+/* 2. High-visibility focus indicators for keyboard navigation */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid #ff6a00 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 4px rgba(255, 106, 0, 0.2) !important;
+}
+
+/* 3. Section Spacing Utility */
+.section-spacing {
+  margin: 5rem 0;
+  padding-top: 3.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* 4. Responsive viewport padding & mobile touch target scale */
+@media (max-width: 768px) {
+  /* Increase touch targets to at least 44px */
+  .nav-link {
+    padding: 0.8rem 1rem !important;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .nav-btn {
+    padding: 0.8rem 1.5rem !important;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .option-radio {
+    padding: 0.8rem 1rem !important;
+    min-height: 44px;
+  }
+  
+  .related-tool-card {
+    padding: 1rem 1.25rem !important;
+    min-height: 44px;
+  }
+  
+  /* Reduce whitespace clutter in layout */
+  .hero {
+    padding: 3rem 1.25rem 2rem !important;
+  }
+  
+  .hero-title {
+    font-size: 2.1rem !important;
+    line-height: 1.25 !important;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.95rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  .tool-card {
+    padding: 1.5rem 1.25rem !important;
+  }
+  
+  .section-spacing {
+    margin: 3rem 0;
+    padding-top: 2.25rem;
+  }
+}
+
+/* Fade-in Animation for error dismissals */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeIn 0.2s ease-in-out;
 }

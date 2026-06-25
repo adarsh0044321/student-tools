@@ -136,11 +136,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Link href="/blog" className="nav-link">Blog</Link>
             
             <Link 
-              href="/" 
+              href="/#tools-section" 
               className="nav-btn" 
               style={{ marginLeft: '1rem' }}
             >
-              Get Started
+              Explore Tools
             </Link>
             <button
               onClick={toggleTheme}

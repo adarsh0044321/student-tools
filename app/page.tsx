@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { HomeToolsList } from '../src/components/HomeToolsList';
 import { BannerAd468x60, StudentPromotionalOffers } from '../src/components/Ads';
 
@@ -53,20 +54,30 @@ export default function HomePage() {
       />
 
       {/* Hero Header */}
-      <section className="hero">
+      <section className="hero" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <h1 className="hero-title">
           Every tool you need to work with <span>PDFs</span> & study calculators, 100% Free
         </h1>
-        <p className="hero-subtitle">
+        <p className="hero-subtitle" style={{ marginBottom: '2.5rem' }}>
           Keep your studies organized, track sem GPA, count words, and compress textbooks safely in-browser. No uploads to external databases.
         </p>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
+          <a href="#tools-section" className="hero-cta-primary">
+            🚀 Launch PDF Tools
+          </a>
+          <Link href="/blog" className="hero-cta-secondary">
+            📚 Read Study Blog
+          </Link>
+        </div>
       </section>
 
       {/* Client-side Tools List Filter */}
-      <HomeToolsList />
+      <div id="tools-section" style={{ scrollMarginTop: '100px' }}>
+        <HomeToolsList />
+      </div>
 
       {/* Why Choose Us Section */}
-      <section style={{ margin: '4rem 0 2rem 0', borderTop: '1px solid var(--border-color)', paddingTop: '3rem' }}>
+      <section className="section-spacing">
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--text-dark)' }}>🔒 Handcrafted for Student Privacy</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginTop: '0.5rem' }}>Why thousands of academic users trust Student Tools for their assignments.</p>
@@ -93,7 +104,7 @@ export default function HomePage() {
       <StudentPromotionalOffers />
 
       {/* FAQs Section */}
-      <section style={{ margin: '4rem 0', borderTop: '1px solid var(--border-color)', paddingTop: '3rem' }}>
+      <section className="section-spacing">
         <h2 style={{ fontSize: '1.8rem', fontWeight: 800, textAlign: 'center', marginBottom: '2rem' }}>💬 Frequently Asked Questions</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '800px', margin: '0 auto' }}>
           <div style={{ padding: '1.25rem', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'var(--white)' }}>
