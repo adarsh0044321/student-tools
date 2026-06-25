@@ -26,3 +26,10 @@ dist-ssr
 # Next.js
 .next
 out
+
+# AI Memory & Context Documentation Files (Local-only)
+BRAIN.md
+ROADMAP.md
+DECISIONS.md
+HANDOVER.md
+SESSION.md
