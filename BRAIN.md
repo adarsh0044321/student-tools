@@ -53,20 +53,36 @@ Interactive Calculators (React UI Components)   PDF / Document Engines (Client-s
 ```
 student-tools/
 ├── app/                  # Next.js App Router (pages, metadata, layout)
+│   ├── blog/             # SEO Blog posts list and dynamic slug routing pages
+│   │   ├── [slug]/       # Individual blog post viewer
+│   │   └── page.tsx      # Blog list page
+│   ├── categories/       # Category page routing (e.g. /categories/organize)
 │   ├── tools/            # Dynamic path-based routing for tools
 │   │   └── [toolId]/     # page.tsx renders tools statically with generateStaticParams()
 │   ├── layout.tsx        # Global layout configuration
-│   └── page.tsx          # Homepage Dashboard listing all utilities
+│   ├── page.tsx          # Homepage Dashboard listing all utilities
+│   ├── robots.ts         # Programmatic robots.txt output
+│   └── sitemap.ts        # Programmatic sitemap.xml output
+├── public/               # Static assets folder
+│   ├── logo.png          # Circular brand logo icon
+│   ├── favicon.svg       # Favicon linking to brand logo
+│   └── icons.svg         # SVG icons fallback sheet
 ├── src/                  # Core application source
 │   ├── components/       # Core layout components and wrapper interfaces
 │   │   ├── calculators/  # Interactive tools & widgets (CGPA, Pomodoro, StudyPlanner, etc.)
-│   │   ├── Ads.tsx       # Placement holders for sponsorship ads
+│   │   ├── Ads.tsx       # Placement holders for script-injected banner and native partner ads
 │   │   ├── HomeToolsList.tsx # Client-side search and category filtering of tools
+│   │   └── Layout.tsx        # Main outer layout, theme toggles, and adblocker barrier detection
 │   │   └── ToolWrapper.tsx   # Directs upload flows and mounts the correct tool engine
 │   ├── tools/            # Pure TypeScript files executing heavy file parsing/compiling
 │   ├── toolsList.ts      # Metadata, SEO descriptions, and configs for all tools
 │   ├── types.ts          # TypeScript declarations and unions
-│   └── index.css         # Global design tokens and responsive utilities
+│   ├── index.css         # Global design tokens and responsive utilities
+│   └── App.css           # Layout utility overrides
+├── vercel.json           # Vercel routing overrides and config
+├── tsconfig.json         # TypeScript configuration
+├── next.config.js        # Next.js compiler settings
+└── .npmrc                # Node configuration forcing legacy dependency resolutions
 ```
 
 ---
@@ -86,13 +102,13 @@ Interactive widget dashboards for grades and schedules.
 * **Implementation**: `src/components/calculators/`.
 * **Key Tools**: CGPA Calculator, Attendance Calculator, Percentage Calculator, Marks Calculator, Grade Calculator, GPA to Percentage, Unit Converter, Scientific Calculator, Age Calculator, Exam Countdown.
 
-### Study Planner (New)
+### Study Planner
 Personalized daily revision timetable generator.
 * **Implementation**: [StudyPlanner.tsx](file:///c:/Users/JAISINGH/.gemini/antigravity-ide/scratch/student-tools/src/components/calculators/StudyPlanner.tsx).
 * **Logic**: Distributes subjects across exam-countdown days proportionally to subject difficulty (Hard gets 3x, Medium gets 2x, Easy gets 1x study sessions). Divides days into 2-hour blocks with break tips.
 * **Features**: Printing styles and CSV downloads.
 
-### Flashcard Quizzer (New)
+### Flashcard Quizzer
 Active recall flashcard study manager.
 * **Implementation**: [FlashcardsQuizzer.tsx](file:///c:/Users/JAISINGH/.gemini/antigravity-ide/scratch/student-tools/src/components/calculators/FlashcardsQuizzer.tsx).
 * **Modes**:
@@ -102,111 +118,145 @@ Active recall flashcard study manager.
 
 ---
 
-# Change Log
+# Change Log (Project History)
+
+## 2026-06-25
+
+### Added
+* `BRAIN.md` persistent memory documentation created to record overall system architecture and evolution. (Updated to include full version control history and release details).
 
 ## 2026-06-24
 
 ### Added
-* `StudyPlanner.tsx` calculator component in `src/components/calculators/`.
-* `FlashcardsQuizzer.tsx` calculator component in `src/components/calculators/`.
+* `StudyPlanner.tsx` component to `src/components/calculators/`.
+* `FlashcardsQuizzer.tsx` component to `src/components/calculators/`.
 
 ### Modified
 * `src/types.ts`: Added `'study-planner'` and `'flashcards'` to `ToolId` union.
-* `src/toolsList.ts`: Appended configurations and SEO data for `'study-planner'` and `'flashcards'`.
-* `src/components/ToolWrapper.tsx`: Imported the new components, handled them inside `renderCalculator()`, and set `maxWidth` to `900px` for these tools to avoid layout squishing.
+* `src/toolsList.ts`: Appended configurations and SEO definitions for the two new tools.
+* `src/components/ToolWrapper.tsx`: Imported the new components, handled them inside `renderCalculator()`, and expanded `maxWidth` constraints to `900px` for both tools.
 
 ### Reason
-* Expanded the platform with study aids to increase retention and daily usage from student users, while retaining the platform's offline-first, client-side privacy.
+* Expanded the platform with study aids to increase daily student user retention, maintaining the platform's offline-first, client-side privacy.
+
+## 2026-06-13
+
+### Modified (Major Refactor & Migration)
+* **Vite-to-Next.js App Router Migration**: Replaced the entire front-end routing framework.
+  * Deleted `index.html`, `src/App.tsx`, `src/main.tsx`, `src/pages/Home.tsx`, `tsconfig.app.json`, `tsconfig.node.json`, and `vite.config.ts`.
+  * Added Next.js configuration and App Router directories (`app/page.tsx`, `app/layout.tsx`, `app/tools/[toolId]/page.tsx`, `app/blog/[slug]/page.tsx`, etc.).
+  * Configured `generateStaticParams()` to pre-render dynamic paths at build time.
+* **12 Academic Widgets**: Integrated 12 browser calculators (GPA, Marks, Pomodoro, etc.) in `src/components/calculators/`.
+* **Programmatic SEO**: Implemented robots, sitemaps, JSON-LD Schema (Breadcrumb & SoftwareApplication structures), and dynamic metadata tags.
+* **Navigation Overhaul**: Fixed navigation routing states when returning to the dashboard.
+* **Monetization & Adblocker Protection**:
+  * Integrated popunder, socialbar, banner, native, and smartlink ads from monetization sponsors to support serverless hosting.
+  * Implemented client-side adblocker detection with a modal barrier.
+
+### Reason
+* Swapped frameworks to optimize search engine ranking indexability and metadata rendering. Added local widgets to increase student utility footprint, and integrated monetization structures to cover hosting and operational costs.
+
+## Earlier Commits
+
+### Modified
+* Favicon changed to the official branded circular logo.
+* Added dark/light theme mode using CSS variables and local storage states.
+* Configured `vercel.json` and added `.npmrc` to bypass node peer-dependency conflicts during static builds.
+
+---
+
+# Bug Fixes & Hotfixes
+
+## Vite-to-Next Routing Glitches
+* **Problem**: Back-navigation buttons inside tools resulted in page crashes or routing loops.
+* **Root Cause**: Next.js App Router client routing cache conflicts and inconsistent history back routing.
+* **Fix**: Re-coded navigation buttons to use explicit routing (`/`) or simple history back handlers, bypassing standard cached routing issues.
+
+## Vercel Build Dependency Conflicts
+* **Problem**: Vercel deployment builds failed due to strict NPM peer dependency resolution conflicts (specifically regarding library requirements in pdfJS and react configurations).
+* **Root Cause**: NPM v7+ strict peer-dependency checks aborted installation due to older react wrappers in certain document libraries.
+* **Fix**: Added `.npmrc` setting `legacy-peer-deps=true` in the project root to force installation of peer dependencies, resolving Vercel build failures.
 
 ---
 
 # Known Issues
 
-## Client-Side Resource Limits
-* **Description**: Since all file compression and conversion algorithms run entirely inside the client's browser engine, extremely large textbooks (e.g. >100MB scans) can exceed the browser memory heap limit or hang thread performance.
-* **Impact**: Medium (only affects extremely heavy PDF files).
-* **Potential Solution**: Implement memory paging or slice file chunks, or show warnings to users before compiling large files.
-* **Priority**: Low
+## 🛡️ Adblocker Modal Barrier (Critical Design Caveat)
+* **Description**: `src/components/Layout.tsx` runs a client-side verification function `checkAdblock`. It appends a dummy element containing ad-typical classnames (`ads advertisement ad-zone doubleclick banner-ad pub_300x250`) to the body, waits 1.5 seconds, and evaluates if the element's height is zero (which happens if blocked by adblock extensions). If blocked, it launches a modal overlay blocking all user interactions.
+* **Impact**: High. Students using adblockers cannot use the site at all until they whitelist the domain.
+* **How to test / modify**: If tweaking the layout, be aware of this detection script. If you need to debug without ads, temporarily disable the adblock check in `Layout.tsx` by commenting out the `setAdblockActive(true)` line.
+
+## Client-Side CPU and Memory Heap Limitations
+* **Description**: Document engines (especially `pdf-lib` and `xlsx`) run completely in the browser thread. Parsing or converting heavy files (>50MB scanned guides) can cause browser freezes or memory crashes.
+* **Impact**: Medium (only on very large files).
+* **Prevention**: Notify users when files are heavy before starting compilation.
 
 ---
 
 # Technical Decisions
 
-## Decision: 100% Client-Side Conversion
-* **Date**: Project Inception
-* **Decision**: Eliminate backend servers for file processing and compile everything in the browser runtime.
-* **Reasoning**:
-  * Zero server costs for PDF processing (which is CPU intensive).
-  * High trustworthiness: school transcripts, coursework, and assignments remain private as files are never uploaded.
+## Vite vs. Next.js Migration
+* **Date**: 2026-06-13
+* **Decision**: Migrate completely from Vite to Next.js App Router.
+* **Reasoning**: Vite works great for SPAs, but lacks SEO advantages. Because the platform relies heavily on search engine indexing for utilities (e.g. searching "merge pdf online free"), Next.js's ability to statically pre-render meta headers and schema markup for every tool path is crucial.
 * **Consequences**:
-  * *Pros*: Infinite horizontal scalability, zero backend server hosting costs, absolute student privacy, near-instant speed on standard file sizes.
-  * *Cons*: Relies entirely on client CPU/RAM, impossible to easily run complex server-side engines (like LibreOffice/Unoconv for exact PPTX/DOCX renderings), meaning Word/PPT converters use custom HTML-to-PDF mock renderers.
+  * *Pros*: Vastly superior search engine rankings, dynamic breadcrumbs/FAQ schema injection, faster initial load times.
+  * *Cons*: Requires dynamic imports `{ ssr: false }` for all components that access browser globals (e.g. `window`, `localStorage`, `document`), adding minor wrapper complexity.
 
 ---
 
-# Agent Notes
+# Agent Notes & Development Constraints
 
-* **SSR Warning**: The `ToolWrapper.tsx` component is dynamically imported with `{ ssr: false }` inside `app/tools/[toolId]/page.tsx`. This is because document processors and window APIs (like Web Audio, localStorage, canvas rendering) rely on browser-only globals. Do not import `ToolWrapper` statically.
-* **Icon Resolution**: Icons are dynamically resolved in `HomeToolsList.tsx` using `Icons[tool.iconName]`. When adding a new tool to `toolsList.ts`, make sure the icon name matches a valid, standard Lucide React icon.
-* **CSS variables**: Styling relies heavily on custom design tokens in `src/index.css`. Avoid hardcoding hex values where variables like `var(--border-color)` or `var(--white)` should be used.
+* **🚨 CRITICAL: Browser Globals & SSR**: Next.js pre-renders code on the server during the build. Since almost all calculators and tools access browser-only APIs (`window`, `document`, `localStorage`, canvas contexts, `AudioContext`), they **will crash** the Next.js server-side build if imported statically.
+  * **Rule**: Always import `ToolWrapper` dynamically with `{ ssr: false }` in `app/tools/[toolId]/page.tsx`. Keep calculators encapsulated inside wrappers that only mount on the client side.
+* **Layout Width Overrides**: The default width wrapper for tools inside `ToolWrapper.tsx` is `640px`. However, the Study Planner and Flashcard Quizzer require more horizontal space. We added an override condition: `maxWidth: ['study-planner', 'flashcards'].includes(toolConfig.id) ? '900px' : '640px'`. Adjust this list if you introduce other grid-heavy widgets.
+* **Sponsorship Script Injections**:
+  * Global ad scripts are loaded in `app/layout.tsx` headers (`heavenlysuspicious.com`).
+  * Ad placeholders are rendered dynamically inside `src/components/Ads.tsx`. Do not delete or break these components, as they ensure serverless costs are funded.
+* **Lucide Icon Mapping**: Homepage lists icons dynamically using `* as Icons` in `HomeToolsList.tsx`. When adding new tools, ensure the `iconName` specified in `toolsList.ts` maps exactly to a valid export in the `lucide-react` package.
 
 ---
 
-# Development Workflow
+# Development & Operational Workflow
 
-### Run Dev Server
+### Dependency Resolutions (.npmrc)
+* Keep `.npmrc` with `legacy-peer-deps=true` intact. Removing it will break Vercel deployment builds due to package clashes.
+
+### Local Development
 ```bash
 npm run dev
 ```
 
-### Build Project
+### Static Build & Type Check
 ```bash
 npm run build
 ```
-
-### Linting
-```bash
-npm run lint
-```
-
----
-
-# Dependency Notes
-
-* **Package**: `pdf-lib`
-  * **Purpose**: Modifies, writes, merges, and inspects PDF documents client-side.
-  * **Do Not Replace Because**: Crucial to almost all PDF organize and security features.
-* **Package**: `pdfjs-dist`
-  * **Purpose**: Renders PDF pages to Canvas, enabling thumbnail previews and client-side OCR.
-  * **Do Not Replace Because**: Essential for visual previews in Split/Organize modules.
-
----
-
-# API Reference Summary
-
-No backend APIs are hosted. Static mapping routes are rendered by Next.js using dynamic routing parameters.
 
 ---
 
 # Database Schema Summary
 
-No database is used. The platform uses HTML5 `localStorage` to save custom user configurations, study schedules, and flashcard decks on the student's own browser partition.
+The application is entirely serverless and database-free. 
+* **State Persistence**: Student datasets (grades, countdowns, schedules, custom flashcard decks) are saved locally on the client's device using HTML5 `localStorage` APIs.
+* **Key Storage Keys**:
+  * `theme`: Stores theme state (`light` | `dark`).
+  * `student_flashcards_decks`: Stores serialized JSON list of flashcard decks.
 
 ---
 
 # AI Context Summary
 
-1. **What the project does**: Offline-first Next.js web application providing client-side PDF converters and calculators.
-2. **Current architecture**: Statically compiled Next.js front-end with SSR disabled on core utility wrappers.
-3. **Recent major changes**: Integrated Study Planner and Flashcard Quizzer.
-4. **Active bugs**: None; large files may hit browser memory limits.
-5. **Next priorities**: Enhance office document conversion quality (Word/PPT) using client-side WebAssembly parser bindings.
-6. **Important warnings**: Always import browser components dynamically to prevent server-side rendering breaks on window objects.
+1. **What the project does**: Client-side document editor and student utility site.
+2. **Current architecture**: Statically compiled Next.js App Router with client-only tool wrappers.
+3. **Recent major changes**: Migrated from Vite to Next.js; added 14 academic widgets (including Study Planner and Flashcard Quizzer); integrated ads & adblocker block screen.
+4. **Active issues**: Strict adblock detection overlay blocks the site if ad blockers are on. Heavy PDFs can crash browser tab memory.
+5. **Next priorities**: Build client-side image editing tools and implement PDF form filling improvements.
+6. **Important warnings**: Never import client-side utilities statically; use `{ ssr: false }`. Keep `.npmrc` peer dependency overrides.
 
 ---
 
 # Last Updated
 
-* **Timestamp**: 2026-06-25 14:00 UTC
+* **Timestamp**: 2026-06-25 14:05 UTC
 * **Updated By**: Antigravity AI Agent
-* **Summary**: Created the project brain state documentation `BRAIN.md` reflecting the overall architecture, tech stack, directory maps, and the recently integrated Study Planner and Flashcard Quizzer features.
+* **Summary**: Expanded `BRAIN.md` with complete historical commit details, including the Vite-to-Next.js migration, adblocker modal barriers, build hacks (`.npmrc`), and crucial serverless/static runtime constraints for future agents.
